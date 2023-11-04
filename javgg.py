@@ -3,12 +3,14 @@ import galleryCrawler as gC
 from pathlib import Path
 from scrapy.http import HtmlResponse
 from streamtape import main as st
-
+from pyIDM import  download
+from time import sleep
+website = "jav.guru"
 fp = r'D:\Developed\Automation\GalleryDownloader\galleryLinks.opml'
 
 def alreadyNotDone(func):
     def wrapper(*args, **kwargs):
-        filename = 'VideoList1'
+        filename = 'VideoList12'
         p = "".join(args[:-1])
         Path('list').parent.mkdir(exist_ok=True, parents=True)
         # Path("list").touch()
@@ -30,25 +32,34 @@ def append_line_to_file(file_path, line_to_append):
     except Exception as e:
         print(f"An error occurred: {str(e)}")
 
-@alreadyNotDone
+def streamtapecall(rr):
+    print(f'>>{rr.url=}')
+    if "stre" in rr.url:
+        breakpoint()
+
+
+# @alreadyNotDone
 def mainparse(url : str, browser):
     context = browser.new_context()
     page = context.new_page()
+    page.on("request", lambda request: streamtapecall(request))
+    page.on("response", lambda response: streamtapecall(response))
     page.goto(url)
-    # breakpoint()
-    urlu = page.locator("p:nth-child(3) > a").get_attribute('href')
-    page.goto(urlu)
-    page.get_by_role("button", name="GET THE VIDEO LINK - CLICK HERE").click()
-    # breakpoint()
-    url_streamtape = page.locator('css=a[href*=stream]').last.get_attribute('href')
-    try:
-        page.goto(url_streamtape)
-        response = HtmlResponse(url=url_streamtape, body=page.content(),encoding='utf-8')
-    except Exception as e:
-        print(e)
-        breakpoint()
-    st(response)
-    # append_line_to_file(fp, url_streamtape)
+    page.get_by_role("link", name="STREAM ST").click()
+    # if1 = page.frame_locator("#post-325518 iframe").frame_locator("iframe")
+    page.frame_locator("#post-325518 iframe").first.locator("div.inner").first.evaluate("start_player()")
+    sleep(10)
+    breakpoint()
+    for i in range(1,100):
+        try:
+            page.frame_locator("#post-325518 iframe").frame_locator("iframe").get_by_role("button", name="Play").click()
+        except Exception as e:
+            print(e)
+            sleep(2)
+    # download(r'C:\Heaven\Haven\brothel\Sherawali', filename, url_t)
+
+# https://lexica.art/prompt/ca7f2856-8f79-4aa8-85c0-45d3e1ef8939
+# https://image.lexica.art/full_jpg/0509ff23-a646-4345-97b9-6a781fa6ed37
 
     context.close()
 
@@ -58,7 +69,8 @@ def run(playwright: Playwright) -> None:
     # url = "https://jpbabe.com/av/av.php?file=juq-369.mp4"
     with open(urlsfile,"r") as fp:
         for url in fp:
-            mainparse(url, browser)
+            if website in url:
+                mainparse(url, browser)
     browser.close()
 
 with sync_playwright() as playwright:

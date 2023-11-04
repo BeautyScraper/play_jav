@@ -3,7 +3,7 @@ import galleryCrawler as gC
 from pathlib import Path
 from scrapy.http import HtmlResponse
 from streamtape import main as st
-
+website = "sextb.net"
 fp = r'D:\Developed\Automation\GalleryDownloader\galleryLinks.opml'
 
 def alreadyNotDone(func):
@@ -30,24 +30,22 @@ def append_line_to_file(file_path, line_to_append):
     except Exception as e:
         print(f"An error occurred: {str(e)}")
 
-@alreadyNotDone
+def streamtapecall(rr):
+    print(f'>>{rr.url=}')
+    if "streamtape" in rr.url:
+        breakpoint()
+
+# @alreadyNotDone
 def mainparse(url : str, browser):
     context = browser.new_context()
     page = context.new_page()
+    page.on("request", lambda request: streamtapecall(request))
+    page.on("response", lambda response: print("<<", response.status, response.url))
     page.goto(url)
-    # breakpoint()
-    urlu = page.locator("p:nth-child(3) > a").get_attribute('href')
-    page.goto(urlu)
-    page.get_by_role("button", name="GET THE VIDEO LINK - CLICK HERE").click()
-    # breakpoint()
-    url_streamtape = page.locator('css=a[href*=stream]').last.get_attribute('href')
-    try:
-        page.goto(url_streamtape)
-        response = HtmlResponse(url=url_streamtape, body=page.content(),encoding='utf-8')
-    except Exception as e:
-        print(e)
-        breakpoint()
-    st(response)
+    breakpoint()
+    page.get_by_role("link", name="Close").click()
+    page.get_by_role("button", name=" ST").click()
+    page.frame_locator("#sextb-player iframe").get_by_text("PausePlay").click()
     # append_line_to_file(fp, url_streamtape)
 
     context.close()
@@ -58,7 +56,8 @@ def run(playwright: Playwright) -> None:
     # url = "https://jpbabe.com/av/av.php?file=juq-369.mp4"
     with open(urlsfile,"r") as fp:
         for url in fp:
-            mainparse(url, browser)
+            if website in url:
+                mainparse(url, browser)
     browser.close()
 
 with sync_playwright() as playwright:
