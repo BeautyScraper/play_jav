@@ -18,7 +18,7 @@ ddir_path = r'D:\paradise\stuff\new\jav'
 
 def alreadyNotDone(func):
     def wrapper(*args, **kwargs):
-        filename = website
+        filename = 'VideoList12'
         p = "".join(args[:-1])
         Path('list').parent.mkdir(exist_ok=True, parents=True)
         # Path("list").touch()
@@ -26,8 +26,8 @@ def alreadyNotDone(func):
         if ret.alreadyNotDownloaded(filename,p):
             try:
                 func(*args, **kwargs)
-            except Exception as e:
-                print(f'Exception: {e}')
+            except:
+                print('something wrong happened')
                 return
             ret.downloadCompleteRegister(filename,p)
     return wrapper
@@ -86,17 +86,26 @@ def run(playwright: Playwright) -> None:
     urlsfile = r'links.opml'
     # browser = playwright.chromium.launch(headless=False)
     user_data_dir = Path(r'C:\dumpinggrounds\playwright_data')
-    shutil.rmtree(user_data_dir)
-    user_data_dir.mkdir(exist_ok=True,parents=True)
-    proxy = load_proxy_from_json('proxies.json')
+    for _ in range(1,1000000):
+        shutil.rmtree(user_data_dir)
+        user_data_dir.mkdir(exist_ok=True,parents=True)
+        proxy = load_proxy_from_json('proxies.json')
 
+        browser = playwright.chromium.launch_persistent_context(user_data_dir,headless=False,proxy=proxy)
+        context = browser
+        page = context.new_page() 
+        try:
+            page.goto('https://mrdeepfakes.com/',timeout=600000,)
+            print(proxy)
+            breakpoint()
+        except Exception as e:
+            print(e)
+        browser.close()
     # url = "https://jpbabe.com/av/av.php?file=juq-369.mp4"
-    browser = playwright.chromium.launch_persistent_context(user_data_dir,headless=False,proxy=proxy)
     with open(urlsfile,"r") as fp:
         for url in fp:
             if website in url:
                 mainparse(url, browser)
-    browser.close()
 
 with sync_playwright() as playwright:
     run(playwright)

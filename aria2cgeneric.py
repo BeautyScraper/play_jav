@@ -42,7 +42,7 @@ def gdurls(urls,dirpath='',file2dnames = None,ids='',connections=4):
         print("no urls to do anything")
         return
 
-    temp = Path(dirpath).parent / re.sub('[^0-9a-zA-Z\.]+', '_', Path(dirpath).name) 
+    temp = Path(dirpath).parent / re.sub('[^0-9a-zA-Z\. -]+', '_', Path(dirpath).name) 
     dirpath = str(temp)
     if file2dnames is None:
         file2dnames = [re.search('.*\.[^ ]*', x.split('/')[-1])[0] for x in urls]
