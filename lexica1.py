@@ -1,4 +1,5 @@
 from playwright.sync_api import Playwright, sync_playwright, expect
+from aria2cgeneric import ariaDownload
 import galleryCrawler as gC
 from pathlib import Path
 from scrapy.http import HtmlResponse
@@ -44,7 +45,7 @@ def mainparse(url : str, browser):
     page = context.new_page()
     # page.on("request", lambda request: streamtapecall(request))
     # page.on("response", lambda response: print("<<", response.status, response.url))
-    for i in range(100, 200):
+    for i in range(1, 500):
         page.goto(url)
         for _ in range((i+1) * 8):
             sleep(2)
@@ -62,7 +63,8 @@ def mainparse(url : str, browser):
             url_ts = post_response.css('img::attr(src)').getall()
             for url_t in url_ts:
                 filename = url_t.split('/')[-1]+'.jpg'
-                download(r'C:\Heaven\Haven\brothel\Sherawali', filename, url_t)
+                ariaDownload(url_t,r'C:\Heaven\Haven\brothel\Sherawali',filename,1)
+                # download(r'C:\Heaven\Haven\brothel\Sherawali', filename, url_t)
 
 # https://lexica.art/prompt/ca7f2856-8f79-4aa8-85c0-45d3e1ef8939
 # https://image.lexica.art/full_jpg/0509ff23-a646-4345-97b9-6a781fa6ed37

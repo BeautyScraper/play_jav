@@ -14,7 +14,7 @@ def load_proxy_from_json(json_file_path):
     sel_p = random.choice(proxy_data)
     # breakpoint()
     proxy={
-    "server": "37.19.220.129:8443"
+    "server": "165.227.44.211:3128"
     # "username": "usr",
     # "password": "pwd"
     }
