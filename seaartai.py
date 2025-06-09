@@ -70,15 +70,17 @@ def mainparse(urlt : str, browser):
     # context = browser.new_context()
     context = browser
     page = context.new_page()
+    page.set_default_timeout(10000) 
+    page.set_default_navigation_timeout(20000)
     # page.on("request", lambda request: streamtapecall(request,filename))
     # page.on("response", lambda response: streamtapecall(response,filename))
     page.goto(urlt)
+    # breakpoint()
     # # with open("cookies.json", "w") as f:
     # #     f.write(json.dumps(context.cookies()))
 
-    page.locator("#overview").get_by_text("View More").click()
+    page.locator("#overview").get_by_text("View More").first.click() 
     # storage = context.storage_state(path="state.json")
-    # breakpoint()
     sleep(5)
     # filename = url.strip('/').split('/')[-1]
     while not has_reached_end_of_page(page):
@@ -88,9 +90,10 @@ def mainparse(urlt : str, browser):
         resp = HtmlResponse(url=urlt, body=page.content(), encoding='utf-8')
         # breakpoint()
         rt = resp.css('img[src*=low]::attr(src)').getall() 
+
         for url in rt:
             dir = Path(r'C:\Heaven\Haven\brothel') / resp.css('.overflow-ellipsis::text').get()
-            ariaDownload(url.replace('low','high'),str(dir), url.split('/')[-1],1)
+            ariaDownload(url.replace('low','high').replace('temp-convert-webp/highwebp/',''),str(dir), 'seaart_ai'+url.split('/')[-1],1)
             # download(r'C:\Heaven\Haven\brothel\Sherawali',, url.replace('low','high'))
         sleep(5)
 
@@ -119,17 +122,17 @@ def mainparse(urlt : str, browser):
 
 def run(playwright: Playwright) -> None:
     urlsfile = r'sealinks.opml'
-    browser = playwright.chromium.launch(headless=False)
+    browser = playwright.chromium.launch(headless=True)
     user_data_dir = Path(r'C:\dumpinggrounds\playwright_data2')
-    user_data_dir.mkdir(exist_ok=True,parents=True)
-    shutil.rmtree(user_data_dir)
-    user_data_dir.mkdir(exist_ok=True,parents=True)
+    # user_data_dir.mkdir(exist_ok=True,parents=True)
+    # shutil.rmtree(user_data_dir)
+    # user_data_dir.mkdir(exist_ok=True,parents=True)
     proxy = load_proxy_from_json('proxies.json')
 
     # url = "https://jpbabe.com/av/av.php?file=juq-369.mp4"
     # browser = playwright.chromium.launch_persistent_context(user_data_dir,headless=False,proxy=proxy)
-    # browser = playwright.chromium.launch_persistent_context(user_data_dir,headless=False,args=["--disable-blink-features=AutomationControlled"])
-    browser = browser.new_context(storage_state="state.json")
+    browser = playwright.chromium.launch_persistent_context(user_data_dir,headless=True,args=["--disable-blink-features=AutomationControlled"])
+    # browser = browser.new_context(storage_state="state.json")
     with open(urlsfile,"r") as fp:
         for url in fp:
             if website in url:
